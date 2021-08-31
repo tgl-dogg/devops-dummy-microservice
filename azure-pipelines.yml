@@ -18,15 +18,9 @@ steps:
     jdkVersionOption: '1.11'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    #codeCoverageToolOption: jaCoCo
-    #testResultsFiles: ['**/TEST-*.xml', '**/jacocoTestReport.xml']
+    codeCoverageToolOption: JaCoCo
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'build'
-- task: CmdLine@2
-  inputs:
-    script: |
-      echo checking directories
-      tree build
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'JaCoCo'
