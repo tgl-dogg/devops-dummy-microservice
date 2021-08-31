@@ -19,17 +19,17 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     #codeCoverageToolOption: jaCoCo
+    #testResultsFiles: ['**/TEST-*.xml', '**/jacocoTestReport.xml']
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'build'
 - task: CmdLine@2
   inputs:
     script: |
-      echo check directories
-      ls
+      echo checking directories
       tree build
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'JaCoCo'
-    summaryFileLocation: '/**/reports/jacoco/test/jacocoTestReport.xml'
-    reportDirectory: '/**/reports/jacoco/test/html'
+    summaryFileLocation: '**/reports/jacoco/test/jacocoTestReport.xml'
+    reportDirectory: '**/reports/jacoco/test/html'
     failIfCoverageEmpty: true
