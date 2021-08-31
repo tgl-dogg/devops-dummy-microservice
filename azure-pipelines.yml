@@ -21,7 +21,7 @@ steps:
     publishJUnitResults: true
     #codeCoverageToolOption: JaCoCo
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'build'
+    tasks: 'build jacocoRootReport'
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'JaCoCo'
