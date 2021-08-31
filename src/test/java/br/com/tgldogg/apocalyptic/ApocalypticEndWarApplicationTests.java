@@ -1,4 +1,4 @@
-package br.com.tgldogg.Apocalyptic;
+package br.com.tgldogg.apocalyptic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
