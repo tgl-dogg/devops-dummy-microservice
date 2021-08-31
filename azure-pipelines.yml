@@ -19,6 +19,11 @@ steps:
     jdkVersionOption: '1.11'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    codeCoverageToolOption: JaCoCo
+    #codeCoverageToolOption: JaCoCo
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'build'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'JaCoCo'
+    summaryFileLocation: ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml
+    reportDirectory: ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/html
