@@ -12,18 +12,24 @@ pool:
 steps:
 - task: Gradle@2
   inputs:
-    workingDirectory: ''
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.11'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
-    #codeCoverageToolOption: JaCoCo
+    #codeCoverageToolOption: jaCoCo
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'build jacocoTestReport'
+    tasks: 'build'
+- task: CmdLine@2
+  inputs:
+    script: |
+      echo check directories
+      ls
+      tree build
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'JaCoCo'
-    summaryFileLocation: ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml
-    reportDirectory: ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/html
+    summaryFileLocation: '/**/reports/jacoco/test/jacocoTestReport.xml'
+    reportDirectory: '/**/reports/jacoco/test/html'
+    failIfCoverageEmpty: true
