@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.5.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'jacoco'
 }
 
 group = 'br.com.tgldogg'
@@ -16,8 +17,23 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	//implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.7'
 }
 
 test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+  toolVersion = '0.8.7'
+}
+
+jacocoTestReport {
+  dependsOn test
+	reports {
+		html.enabled true
+		xml.enabled true
+	}
 }
