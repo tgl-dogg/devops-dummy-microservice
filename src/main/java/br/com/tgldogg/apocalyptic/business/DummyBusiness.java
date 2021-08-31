@@ -1,5 +1,7 @@
 package br.com.tgldogg.apocalyptic.business;
 
+import org.springframework.stereotype.Component;
+
 @Component
 public class DummyBusiness {
 
