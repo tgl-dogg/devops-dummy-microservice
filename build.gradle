@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'br.com.tgldogg'
-version = '0.0.1-warpremier'
+version = '0.0.3-warpremier'
 sourceCompatibility = '11'
 
 repositories {
@@ -49,7 +49,7 @@ jacocoTestReport {
 
 
 // Nome da organização para a imagem docker
-def dockerOrgName = 'apocalypticendwar.jfrog.io/deathinitive-docker/'
+def dockerOrgName = 'apocalypticendwar.jfrog.io/deathinitive-docker'
 
 def javaServerPort = project.hasProperty('javaServerPort') ? project.property('javaServerPort') : '8080'
 
