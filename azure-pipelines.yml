@@ -49,23 +49,18 @@ steps:
     reportDirectory: '**/reports/jacoco/test/html'
     failIfCoverageEmpty: true
 
-#- task: Gradle@2
-#  displayName: 'Gradle DockerPush'
-#  inputs:
-#    gradleWrapperFile: 'gradlew'
-#    tasks: 'dockerPush'
-#    publishJUnitResults: false
-#    javaHomeOption: 'JDKVersion'
-#    sonarQubeRunAnalysis: false
-#    spotBugsAnalysis: 
-    
-- task: ArtifactoryGradle@1
+- task: Docker@2
+  displayName: 'Docker Login'
   inputs:
-    gradleBuildFile: 'build.gradle'
+    containerRegistry: 'JFrog Docker Registry'
+    command: 'login'
+
+- task: Gradle@2
+  displayName: 'Gradle DockerPush'
+  inputs:
+    gradleWrapperFile: 'gradlew'
     tasks: 'dockerPush'
-    artifactoryResolverService: 'JFrog Artifactory Connection'
-    sourceRepo: 'deathinitive-docker'
-    artifactoryDeployerService: 'JFrog Artifactory Connection'
-    targetRepo: 'deathinitive-docker'
-    deployMavenDesc: false
-    deployIvyDesc: false
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: 
