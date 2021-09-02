@@ -2,11 +2,15 @@ plugins {
 	id 'org.springframework.boot' version '2.5.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+
 	id 'jacoco'
+	
+    id "com.palantir.docker" version "0.28.0"
+    id "com.palantir.docker-run" version "0.28.0"
 }
 
 group = 'br.com.tgldogg'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.3-warpremier'
 sourceCompatibility = '11'
 
 repositories {
@@ -15,10 +19,15 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	//implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.7'
+}
+
+jar {
+    enabled = false
 }
 
 test {
@@ -36,4 +45,34 @@ jacocoTestReport {
 		html.enabled true
 		xml.enabled true
 	}
+}
+
+
+// Nome da organização para a imagem docker
+def dockerOrgName = 'apocalypticendwar.jfrog.io/deathinitive-docker'
+
+def javaServerPort = project.hasProperty('javaServerPort') ? project.property('javaServerPort') : '8080'
+
+//def jarName = "$project.name-$project.version"
+docker {
+    name "${dockerOrgName}/$project.name:$project.version"
+    tag "$project.name", "${dockerOrgName}/$project.name:$project.version"
+    //dockerfile file('Dockerfile')
+    // files "build/libs/${jarName}.jar"
+    copySpec.from("build/libs").into("build/libs")
+    buildArgs([BUILD_VERSION: "$project.version"])
+    // labels(['key': 'value'])
+    pull false
+    noCache false
+}
+
+dockerRun {
+    name "$project.name"
+    image "${dockerOrgName}/$project.name:$project.version"
+    // volumes 'hostvolume': '/containervolume'
+    ports "${javaServerPort}:8080"
+    daemonize true
+    clean true
+    // env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
+    // command 'sleep', '100'
 }
