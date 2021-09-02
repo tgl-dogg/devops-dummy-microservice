@@ -48,3 +48,13 @@ steps:
     summaryFileLocation: '**/reports/jacoco/test/jacocoTestReport.xml'
     reportDirectory: '**/reports/jacoco/test/html'
     failIfCoverageEmpty: true
+
+- task: Gradle@2
+  displayName: 'Gradle DockerPush'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'dockerPush'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: false
