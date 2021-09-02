@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- '*'
+  - '*'
 
 pool:
   vmImage: ubuntu-latest
@@ -13,54 +13,62 @@ variables:
   GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 
 steps:
-- task: Cache@2
-  displayName: Configure Gradle Caching
-  inputs:
-    key: 'gradle | "$(Agent.OS)" | **/build.gradle' # Swap build.gradle.kts for build.gradle when using Groovy
-    restoreKeys: |
-      gradle | "$(Agent.OS)"
-      gradle
-    path: $(GRADLE_USER_HOME)
+  - task: Cache@2
+    displayName: Configure Gradle Caching
+    inputs:
+      key: 'gradle | "$(Agent.OS)" | **/build.gradle' # Swap build.gradle.kts for build.gradle when using Groovy
+      restoreKeys: |
+        gradle | "$(Agent.OS)"
+        gradle
+      path: $(GRADLE_USER_HOME)
 
-- task: Gradle@2
-  displayName: 'Gradle Build'
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    #codeCoverageToolOption: JaCoCo
-    testResultsFiles: '**/TEST-*.xml'
-    tasks: 'build'
-    options: '--build-cache'
+  - task: Gradle@2
+    displayName: 'Gradle Build'
+    inputs:
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.11'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      #codeCoverageToolOption: JaCoCo
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'build'
+      options: '--build-cache'
 
-- script: |
-    # stop the Gradle daemon to ensure no files are left open (impacting the save cache operation later)
-    ./gradlew --stop
-  displayName: 'Stop Gradle Daemon'
+  - script: |
+      # stop the Gradle daemon to ensure no files are left open (impacting the save cache operation later)
+      ./gradlew --stop
+    displayName: 'Stop Gradle Daemon'
 
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish JaCoCo Test Reports'
-  inputs:
-    codeCoverageTool: 'JaCoCo'
-    summaryFileLocation: '**/reports/jacoco/test/jacocoTestReport.xml'
-    reportDirectory: '**/reports/jacoco/test/html'
-    failIfCoverageEmpty: true
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish JaCoCo Test Reports'
+    inputs:
+      codeCoverageTool: 'JaCoCo'
+      summaryFileLocation: '**/reports/jacoco/test/jacocoTestReport.xml'
+      reportDirectory: '**/reports/jacoco/test/html'
+      failIfCoverageEmpty: true
 
-- task: Docker@2
-  displayName: 'Docker Login'
-  inputs:
-    containerRegistry: 'JFrog Docker Registry'
-    command: 'login'
+  - task: Docker@2
+    displayName: 'Docker Login'
+    inputs:
+      containerRegistry: 'JFrog Docker Registry'
+      command: 'login'
 
-- task: Gradle@2
-  displayName: 'Gradle DockerPush'
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'dockerPush'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: false
-    spotBugsAnalysis: 
+  - task: Cache@2
+    displayName: Cache Docker
+    inputs:
+      key: 'docker | "$(Agent.OS)" | cache'
+      restoreKeys: |
+        docker | "$(Agent.OS)"
+      path: $(Pipeline.Workspace)/docker
+
+  - task: Gradle@2
+    displayName: 'Gradle DockerPush'
+    inputs:
+      gradleWrapperFile: 'gradlew'
+      tasks: 'dockerPush'
+      publishJUnitResults: false
+      javaHomeOption: 'JDKVersion'
+      sonarQubeRunAnalysis: false
+      spotBugsAnalysis:
