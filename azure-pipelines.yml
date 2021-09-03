@@ -11,12 +11,6 @@ pool:
 
 variables:
   GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
-  
-# Azure pipeline template for loading the Docker cache
-parameters:
-  - name: cacheImages
-    type: string
-    default: alpine:latest
 
 steps:
   - task: Cache@2
@@ -59,28 +53,6 @@ steps:
     inputs:
       containerRegistry: 'JFrog Docker Registry'
       command: 'login'
-
-  - task: Cache@2
-    displayName: 'Configure Docker Caching'
-    inputs:
-      key: docker | **/Dockerfile | "${{ parameters.cacheImages }}"
-      path: $(Pipeline.Workspace)/docker
-      cacheHitVar: DOCKER_CACHE_RESTORED
-
-  - script: |
-      gunzip -c $(Pipeline.Workspace)/docker/cache.tar.gz | docker load
-    displayName: Restore Docker image cache
-    condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
-
-  - script: |
-      mkdir -p $(Pipeline.Workspace)/docker
-      for fn in ${{ parameters.cacheImages }}
-      do
-        docker pull -q $fn
-      done
-      docker save ${{ parameters.cacheImages }} | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
-    displayName: Populate docker image cache
-    condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
 
   - task: Gradle@2
     displayName: 'Gradle DockerPush'
