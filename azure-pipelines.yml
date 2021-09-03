@@ -56,7 +56,7 @@ steps:
       command: 'login'
 
   - task: Cache@2
-    displayName: Cache Docker
+    displayName: 'Configure Docker Caching'
     inputs:
       key: 'docker | "$(Agent.OS)" | cache'
       restoreKeys: |
@@ -68,7 +68,8 @@ steps:
     inputs:
       gradleWrapperFile: 'gradlew'
       tasks: 'dockerPush'
-      publishJUnitResults: false
       javaHomeOption: 'JDKVersion'
+      options: '--build-cache'
+      publishJUnitResults: false
       sonarQubeRunAnalysis: false
-      spotBugsAnalysis:
+      spotBugsAnalysis: false
