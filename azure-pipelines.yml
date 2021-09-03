@@ -11,6 +11,12 @@ pool:
 
 variables:
   GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
+  
+# Azure pipeline template for loading the Docker cache
+parameters:
+  - name: cacheImages
+    type: string
+    default: alpine:latest
 
 steps:
   - task: Cache@2
@@ -57,10 +63,9 @@ steps:
   - task: Cache@2
     displayName: 'Configure Docker Caching'
     inputs:
-      key: 'docker | "$(Agent.OS)" | cache'
-      restoreKeys: |
-        docker | "$(Agent.OS)"
+      key: docker | **/Dockerfile | "${{ parameters.cacheImages }}"
       path: $(Pipeline.Workspace)/docker
+      cacheHitVar: DOCKER_CACHE_RESTORED
 
   - script: |
       gunzip -c $(Pipeline.Workspace)/docker/cache.tar.gz | docker load
@@ -69,11 +74,11 @@ steps:
 
   - script: |
       mkdir -p $(Pipeline.Workspace)/docker
-      for fn in cache
+      for fn in "${{ parameters.cacheImages }}"
       do
         docker pull -q $fn
       done
-      docker save cache | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
+      docker save "${{ parameters.cacheImages }}" | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
     displayName: 'Populate Docker Image Cache'
     condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
 
@@ -83,7 +88,6 @@ steps:
       gradleWrapperFile: 'gradlew'
       tasks: 'dockerPush'
       javaHomeOption: 'JDKVersion'
-      options: '--build-cache'
       publishJUnitResults: false
       sonarQubeRunAnalysis: false
       spotBugsAnalysis: false
