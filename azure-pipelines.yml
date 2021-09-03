@@ -31,7 +31,6 @@ steps:
       jdkVersionOption: '1.11'
       jdkArchitectureOption: 'x64'
       publishJUnitResults: true
-      #codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/TEST-*.xml'
       tasks: 'build'
       options: '--build-cache'
@@ -61,7 +60,22 @@ steps:
       key: 'docker | "$(Agent.OS)" | cache'
       restoreKeys: |
         docker | "$(Agent.OS)"
-      path: $(GRADLE_USER_HOME)
+      path: $(Pipeline.Workspace)/docker
+
+  - script: |
+      gunzip -c $(Pipeline.Workspace)/docker/cache.tar.gz | docker load
+    displayName: Restore Docker Image Cache
+    condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
+
+  - script: |
+      mkdir -p $(Pipeline.Workspace)/docker
+      for fn in ${{ parameters.cacheImages }}
+      do
+        docker pull -q $fn
+      done
+      docker save ${{ parameters.cacheImages }} | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
+    displayName: Populate Docker Image Cache
+    condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
 
   - task: Gradle@2
     displayName: 'Gradle DockerPush'
