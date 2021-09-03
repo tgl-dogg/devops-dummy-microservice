@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'br.com.tgldogg'
-version = '0.1.2-warmastered'
+version = '0.1.3-warmastered'
 sourceCompatibility = '11'
 
 repositories {
