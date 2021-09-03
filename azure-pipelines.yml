@@ -69,17 +69,17 @@ steps:
 
   - script: |
       gunzip -c $(Pipeline.Workspace)/docker/cache.tar.gz | docker load
-    displayName: 'Restore Docker Image Cache'
+    displayName: Restore Docker image cache
     condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
 
   - script: |
       mkdir -p $(Pipeline.Workspace)/docker
-      for fn in "${{ parameters.cacheImages }}"
+      for fn in ${{ parameters.cacheImages }}
       do
         docker pull -q $fn
       done
-      docker save "${{ parameters.cacheImages }}" | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
-    displayName: 'Populate Docker Image Cache'
+      docker save ${{ parameters.cacheImages }} | gzip -9c &gt; $(Pipeline.Workspace)/docker/cache.tar.gz
+    displayName: Populate docker image cache
     condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
 
   - task: Gradle@2
